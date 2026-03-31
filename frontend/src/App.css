@@ -1,0 +1,12 @@
+/* App.css */
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Optional smooth font */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
