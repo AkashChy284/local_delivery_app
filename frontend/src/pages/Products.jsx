@@ -9,9 +9,12 @@ const Products = ({ selectedCategory }) => {
 
   const phoneNumber = "919876543210";
 
+  // ✅ USE DEPLOYED BACKEND (IMPORTANT)
+  const BASE_URL = "https://local-delivery-backend.onrender.com";
+
   // ✅ FETCH FROM BACKEND
   useEffect(() => {
-    let url = "http://localhost:5000/api/products";
+    let url = `${BASE_URL}/api/products`;
 
     if (selectedCategory) {
       url += `?category=${encodeURIComponent(selectedCategory)}`;
@@ -23,34 +26,34 @@ const Products = ({ selectedCategory }) => {
       .catch((err) => console.error(err));
   }, [selectedCategory]);
 
-  // ✅ FILTER SEARCH ONLY
-  const filteredProducts = products.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // ✅ FIXED FILTER (category + search + trim bug)
+  const filteredProducts = products.filter((item) => {
+    const matchCategory = selectedCategory
+      ? item.category?.trim().toLowerCase() === selectedCategory.toLowerCase()
+      : true;
+
+    const matchSearch = item.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    return matchCategory && matchSearch;
+  });
 
   // ✅ TOTALS
   const totalItems = cart.reduce((a, b) => a + b.qty, 0);
-  const totalPrice = cart.reduce(
-    (a, b) => a + b.price * b.qty,
-    0
-  );
+  const totalPrice = cart.reduce((a, b) => a + b.price * b.qty, 0);
 
   // ✅ WHATSAPP
   const placeOrder = () => {
     let message = "Hi, I want to place an order:\n\n";
 
     cart.forEach((item) => {
-      message += `${item.name} - Qty: ${item.qty} - ₹${
-        item.price * item.qty
-      }\n`;
+      message += `${item.name} - Qty: ${item.qty} - ₹${item.price * item.qty}\n`;
     });
 
-    message += `\nSubtotal (Approx): ₹${totalPrice}`;
+    message += `\nTotal: ₹${totalPrice}`;
 
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
-
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
 
@@ -84,17 +87,16 @@ const Products = ({ selectedCategory }) => {
             >
               <img
                 src={item.image}
+                alt={item.name}
                 className="h-20 mx-auto mb-2 object-contain"
               />
 
               <p className="text-sm font-medium">{item.name}</p>
-              <p className="text-xs text-gray-500">
-                Approx ₹{item.price}
-              </p>
+              <p className="text-xs text-gray-500">₹{item.price}</p>
 
               {!cartItem ? (
                 <button
-                  onClick={() => addToCart(item)}
+                  onClick={() => addToCart({ ...item, id: item._id })}
                   className="mt-2 bg-green-600 text-white px-4 py-1 rounded-lg text-sm"
                 >
                   Add
