@@ -10,7 +10,7 @@ const Products = ({ selectedCategory }) => {
   const phoneNumber = "919876543210";
 
   // ✅ USE DEPLOYED BACKEND (IMPORTANT)
-  const BASE_URL = "https://local-delivery-backend.onrender.com";
+  const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
 
   // ✅ FETCH FROM BACKEND
   useEffect(() => {
