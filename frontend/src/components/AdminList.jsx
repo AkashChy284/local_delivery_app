@@ -3,24 +3,35 @@ import { useEffect, useState } from "react";
 export default function AdminList() {
   const [products, setProducts] = useState([]);
 
+  // ✅ Use deployed backend
+  const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
+
   // ✅ FETCH PRODUCTS
   const fetchProducts = async () => {
-    const res = await fetch("http://localhost:5000/api/products");
-    const data = await res.json();
-    setProducts(data);
+    try {
+      const res = await fetch(`${BASE_URL}/api/products`);
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  // ❌ DELETE PRODUCT
+  // ❌ DELETE PRODUCT → FIXED
   const deleteProduct = async (id) => {
-    await fetch(`http://localhost:5000/api/products/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      await fetch(`${BASE_URL}/api/products/${id}`, {
+        method: "DELETE",
+      });
 
-    fetchProducts(); // refresh
+      fetchProducts(); // refresh
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -36,6 +47,7 @@ export default function AdminList() {
             <div className="flex items-center gap-3">
               <img
                 src={item.image}
+                alt={item.name}
                 className="h-12 w-12 object-cover rounded"
               />
               <div>

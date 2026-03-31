@@ -8,6 +8,9 @@ export default function AdminForm() {
     image: null,
   });
 
+  // ✅ IMPORTANT: use deployed backend
+  const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -28,10 +31,14 @@ export default function AdminForm() {
     formData.append("image", form.image);
 
     try {
-      const res = await fetch("http://localhost:5000/api/products", {
+      const res = await fetch(`${BASE_URL}/api/products`, {
         method: "POST",
         body: formData,
       });
+
+      if (!res.ok) {
+        throw new Error("Failed to add product");
+      }
 
       await res.json();
 
