@@ -7,12 +7,10 @@ const Products = ({ selectedCategory }) => {
 
   const { cart, addToCart, increaseQty, decreaseQty } = useCart();
 
-  const phoneNumber = "919876543210";
+  const phoneNumber = "918935847223";
 
-  // ✅ USE DEPLOYED BACKEND (IMPORTANT)
   const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
 
-  // ✅ FETCH FROM BACKEND
   useEffect(() => {
     let url = `${BASE_URL}/api/products`;
 
@@ -26,7 +24,6 @@ const Products = ({ selectedCategory }) => {
       .catch((err) => console.error(err));
   }, [selectedCategory]);
 
-  // ✅ FIXED FILTER (category + search + trim bug)
   const filteredProducts = products.filter((item) => {
     const matchCategory = selectedCategory
       ? item.category?.trim().toLowerCase() === selectedCategory.toLowerCase()
@@ -39,16 +36,16 @@ const Products = ({ selectedCategory }) => {
     return matchCategory && matchSearch;
   });
 
-  // ✅ TOTALS
   const totalItems = cart.reduce((a, b) => a + b.qty, 0);
   const totalPrice = cart.reduce((a, b) => a + b.price * b.qty, 0);
 
-  // ✅ WHATSAPP
   const placeOrder = () => {
     let message = "Hi, I want to place an order:\n\n";
 
     cart.forEach((item) => {
-      message += `${item.name} - Qty: ${item.qty} - ₹${item.price * item.qty}\n`;
+      message += `${item.name} - Qty: ${item.qty} - ₹${
+        item.price * item.qty
+      }\n`;
     });
 
     message += `\nTotal: ₹${totalPrice}`;
@@ -74,7 +71,7 @@ const Products = ({ selectedCategory }) => {
         </button>
       </div>
 
-      {/* PRODUCTS GRID */}
+      {/* PRODUCTS */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
         {filteredProducts.map((item) => {
@@ -96,7 +93,7 @@ const Products = ({ selectedCategory }) => {
 
               {!cartItem ? (
                 <button
-                  onClick={() => addToCart({ ...item, id: item._id })}
+                  onClick={() => addToCart(item)} // ✅ FIXED
                   className="mt-2 bg-green-600 text-white px-4 py-1 rounded-lg text-sm"
                 >
                   Add
