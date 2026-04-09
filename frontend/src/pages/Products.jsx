@@ -8,7 +8,6 @@ const Products = ({ selectedCategory }) => {
   const { cart, addToCart, increaseQty, decreaseQty } = useCart();
 
   const phoneNumber = "918935847223";
-
   const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
 
   useEffect(() => {
@@ -58,21 +57,21 @@ const Products = ({ selectedCategory }) => {
     <div className="px-4">
 
       {/* SEARCH */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-6 flex gap-2 max-w-xl mx-auto">
         <input
           type="text"
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 border rounded-lg px-3 py-2"
+          className="flex-1 border rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
         />
-        <button className="bg-green-700 text-white px-4 rounded-lg">
+        <button className="bg-yellow-400 px-5 rounded-lg font-semibold hover:bg-yellow-500 transition">
           Search
         </button>
       </div>
 
-      {/* PRODUCTS */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {/* PRODUCTS GRID */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
 
         {filteredProducts.map((item) => {
           const cartItem = cart.find((i) => i._id === item._id);
@@ -80,38 +79,38 @@ const Products = ({ selectedCategory }) => {
           return (
             <div
               key={item._id}
-              className="border rounded-xl p-3 text-center shadow-sm"
+              className="bg-white rounded-2xl p-4 text-center shadow-md hover:shadow-xl transition duration-300"
             >
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-20 mx-auto mb-2 object-contain"
+                className="h-24 mx-auto mb-3 object-contain"
               />
 
-              <p className="text-sm font-medium">{item.name}</p>
-              <p className="text-xs text-gray-500">₹{item.price}</p>
+              <p className="text-sm font-semibold">{item.name}</p>
+              <p className="text-red-600 font-bold mt-1">₹{item.price}</p>
 
               {!cartItem ? (
                 <button
-                  onClick={() => addToCart(item)} // ✅ FIXED
-                  className="mt-2 bg-green-600 text-white px-4 py-1 rounded-lg text-sm"
+                  onClick={() => addToCart(item)}
+                  className="mt-3 bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-700 transition"
                 >
-                  Add
+                  Add to Cart
                 </button>
               ) : (
-                <div className="flex justify-center items-center gap-2 mt-2">
+                <div className="flex justify-center items-center gap-3 mt-3">
                   <button
                     onClick={() => decreaseQty(item._id)}
-                    className="px-2 bg-gray-200 rounded"
+                    className="px-3 py-1 bg-gray-200 rounded-lg font-bold"
                   >
                     -
                   </button>
 
-                  <span>{cartItem.qty}</span>
+                  <span className="font-semibold">{cartItem.qty}</span>
 
                   <button
                     onClick={() => increaseQty(item._id)}
-                    className="px-2 bg-gray-200 rounded"
+                    className="px-3 py-1 bg-gray-200 rounded-lg font-bold"
                   >
                     +
                   </button>
@@ -123,19 +122,19 @@ const Products = ({ selectedCategory }) => {
 
       </div>
 
-      {/* WHATSAPP BAR */}
+      {/* WHATSAPP FLOAT BAR */}
       {totalItems > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-green-600 text-white px-6 py-4 flex justify-between items-center">
-          <div>
-            <p>{totalItems} items</p>
-            <p>₹{totalPrice}</p>
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-6">
+          
+          <div className="text-sm font-medium">
+            {totalItems} items | ₹{totalPrice}
           </div>
 
           <button
             onClick={placeOrder}
-            className="bg-white text-green-600 px-4 py-2 rounded-lg"
+            className="bg-white text-green-600 px-4 py-1.5 rounded-full font-semibold hover:bg-gray-100 transition"
           >
-            Order on WhatsApp
+            💬 Order Now
           </button>
         </div>
       )}
