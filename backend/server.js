@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js";
-import authRoutes from "./routes/authRoutes.js"; // ✅ NEW
+import { authRoutes } from "./routes/authRoutes.js"; 
 
 dotenv.config();
 connectDB();

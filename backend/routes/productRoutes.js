@@ -7,14 +7,14 @@ import {
 } from "../controllers/productController.js";
 
 import upload from "../middleware/upload.js";
-import authMiddleware from "../middleware/auth.js"; // ✅ add this
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
-// 📋 PUBLIC
+// 📋 PUBLIC ROUTE (no auth)
 router.get("/", getProducts);
 
-// 🔐 PROTECTED
+// 🔐 PROTECTED ROUTES (admin only)
 router.post("/", authMiddleware, upload.single("image"), addProduct);
 
 router.delete("/:id", authMiddleware, deleteProduct);
