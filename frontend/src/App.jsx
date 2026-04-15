@@ -4,6 +4,7 @@ import Categories from "./pages/Categories";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin"; // ✅ add this
 
 function App() {
   return (
@@ -12,7 +13,13 @@ function App() {
       <Route path="/categories" element={<Categories />} />
       <Route path="/products" element={<Products />} />
       <Route path="/cart" element={<Cart />} />
-      <Route path="/admin" element={<Admin />} />
+
+      {/* 🔐 ADMIN ROUTES */}
+      <Route path="/admin-login" element={<AdminLogin />} /> {/* ✅ login */}
+      <Route path="/shivam-secret-admin-123" element={<Admin />} /> {/* ✅ secret panel */}
+
+      {/* ❌ REMOVE THIS (not secure) */}
+      {/* <Route path="/admin" element={<Admin />} /> */}
     </Routes>
   );
 }
