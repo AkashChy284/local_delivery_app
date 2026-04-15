@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function AdminForm() {
+export default function AdminForm({ onProductAdded }) {
   const [form, setForm] = useState({
     name: "",
     price: "",
@@ -8,7 +8,8 @@ export default function AdminForm() {
     image: null,
   });
 
-  // ✅ IMPORTANT: use deployed backend
+  const [loading, setLoading] = useState(false);
+
   const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
 
   const handleChange = (e) => {
@@ -24,6 +25,13 @@ export default function AdminForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.image) {
+      alert("⚠️ Please select an image");
+      return;
+    }
+
+    setLoading(true);
+
     const formData = new FormData();
     formData.append("name", form.name);
     formData.append("price", form.price);
@@ -31,8 +39,11 @@ export default function AdminForm() {
     formData.append("image", form.image);
 
     try {
+      const token = localStorage.getItem("adminToken"); // optional
+
       const res = await fetch(`${BASE_URL}/api/products`, {
         method: "POST",
+        headers: token ? { Authorization: token } : {}, // ✅ SAFE (won’t break)
         body: formData,
       });
 
@@ -51,9 +62,16 @@ export default function AdminForm() {
         image: null,
       });
 
+      // 🔄 Refresh product list if function passed
+      if (onProductAdded) {
+        onProductAdded();
+      }
+
     } catch (err) {
       console.error(err);
       alert("❌ Error adding product");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,8 +116,14 @@ export default function AdminForm() {
         required
       />
 
-      <button className="w-full bg-green-600 text-white py-2 rounded-lg">
-        Add Product
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full py-2 rounded-lg text-white ${
+          loading ? "bg-gray-400" : "bg-green-600"
+        }`}
+      >
+        {loading ? "Adding..." : "Add Product"}
       </button>
     </form>
   );

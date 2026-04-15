@@ -3,23 +3,22 @@ import {
   getProducts,
   addProduct,
   deleteProduct,
-  updateProduct, // ✅ add this
+  updateProduct,
 } from "../controllers/productController.js";
 
 import upload from "../middleware/upload.js";
+import authMiddleware from "../middleware/auth.js"; // ✅ add this
 
 const router = express.Router();
 
-// 📋 GET all products
+// 📋 PUBLIC
 router.get("/", getProducts);
 
-// ➕ ADD product (with image upload)
-router.post("/", upload.single("image"), addProduct);
+// 🔐 PROTECTED
+router.post("/", authMiddleware, upload.single("image"), addProduct);
 
-// ❌ DELETE product
-router.delete("/:id", deleteProduct);
+router.delete("/:id", authMiddleware, deleteProduct);
 
-// ✏️ UPDATE product
-router.put("/:id", upload.single("image"), updateProduct);
+router.put("/:id", authMiddleware, upload.single("image"), updateProduct);
 
 export default router;

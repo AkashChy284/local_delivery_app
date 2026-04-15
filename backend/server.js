@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js";
+import authRoutes from "./routes/authRoutes.js"; // ✅ NEW
 
 dotenv.config();
 connectDB();
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Routes
+app.use("/api/auth", authRoutes); // ✅ NEW (login route)
 app.use("/api/products", productRoutes);
 
 // ✅ PORT
