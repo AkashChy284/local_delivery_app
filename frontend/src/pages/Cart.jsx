@@ -10,6 +10,9 @@ export default function Cart() {
 
   const phoneNumber = "918935847223";
 
+  // ✅ BACKEND URL
+  const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
+
   // ✅ TOTAL
   const totalPrice = cart.reduce(
     (acc, item) => acc + item.price * item.qty,
@@ -35,6 +38,46 @@ export default function Cart() {
 
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
+  };
+
+  // 🛒 NEW: PLACE ORDER (DATABASE)
+  const placeOrder = async () => {
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    const orderData = {
+      customerName: "Customer",
+      phone: "9999999999",
+      address: "Village Address",
+
+      items: cart.map((item) => ({
+        name: item.name,
+        price: item.price,
+        quantity: item.qty,
+      })),
+
+      totalAmount: totalPrice,
+    };
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!res.ok) throw new Error();
+
+      alert("✅ Order Saved (Admin will process)");
+
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to place order");
+    }
   };
 
   return (
@@ -114,6 +157,15 @@ export default function Cart() {
                 <p className="font-semibold text-lg">₹{totalPrice}</p>
               </div>
 
+              {/* 🛒 NEW BUTTON */}
+              <button
+                onClick={placeOrder}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg mb-3 hover:bg-blue-700"
+              >
+                🛒 Place Order
+              </button>
+
+              {/* EXISTING WHATSAPP */}
               <button
                 onClick={sendWhatsApp}
                 className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"

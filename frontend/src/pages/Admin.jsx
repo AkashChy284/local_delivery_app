@@ -1,11 +1,14 @@
 import { Navigate } from "react-router-dom";
 import { useState } from "react";
-import AdminForm from "../components/AdminForm";
-import AdminList from "../components/AdminList";
+
+import Sidebar from "../components/admin/Sidebar";
+import Dashboard from "../components/admin/Dashboard";
+import Products from "../components/admin/Products";
 
 export default function Admin() {
   const token = localStorage.getItem("adminToken");
 
+  const [active, setActive] = useState("dashboard");
   const [refresh, setRefresh] = useState(false);
 
   if (!token) {
@@ -18,24 +21,39 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-green-100 p-6">
-      {/* 🔥 Header */}
-      <div className="flex justify-between items-center mb-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+    <div className="flex min-h-screen bg-gray-100">
+      
+      {/* 🔥 Sidebar */}
+      <Sidebar active={active} setActive={setActive} />
 
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-1 rounded"
-        >
-          Logout
-        </button>
+      {/* 🔥 Main Content */}
+      <div className="flex-1 p-6">
+
+        {/* 🔥 Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold capitalize">
+            {active}
+          </h1>
+
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-1 rounded"
+          >
+            Logout
+          </button>
+        </div>
+
+        {/* 🔥 Dynamic Pages */}
+        {active === "dashboard" && <Dashboard />}
+        
+        {active === "products" && (
+          <Products
+            refresh={refresh}
+            setRefresh={setRefresh}
+          />
+        )}
+
       </div>
-
-      {/* 🔥 Form */}
-      <AdminForm onProductAdded={() => setRefresh(!refresh)} />
-
-      {/* 🔥 List */}
-      <AdminList key={refresh} />
     </div>
   );
 }
