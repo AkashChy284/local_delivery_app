@@ -4,6 +4,7 @@ import { useState } from "react";
 import Sidebar from "../components/admin/Sidebar";
 import Dashboard from "../components/admin/Dashboard";
 import Products from "../components/admin/Products";
+import Orders from "../components/admin/Orders.jsx";
 
 export default function Admin() {
   const token = localStorage.getItem("adminToken");
@@ -22,7 +23,7 @@ export default function Admin() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      
+
       {/* 🔥 Sidebar */}
       <Sidebar active={active} setActive={setActive} />
 
@@ -43,9 +44,11 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* 🔥 Dynamic Pages */}
-        {active === "dashboard" && <Dashboard />}
-        
+        {/* 🔥 Pages */}
+        {active === "dashboard" && (
+          <Dashboard setActive={setActive} />
+        )}
+
         {active === "products" && (
           <Products
             refresh={refresh}
@@ -53,6 +56,7 @@ export default function Admin() {
           />
         )}
 
+        {active === "orders" && <Orders />}
       </div>
     </div>
   );

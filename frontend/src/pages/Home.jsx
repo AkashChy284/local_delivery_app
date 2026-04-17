@@ -1,5 +1,5 @@
-import Navbar from "../components/Navbar";
 import { useState } from "react";
+import Layout from "../components/Layout";
 import Products from "./Products";
 
 import heroImg from "../assets/hero.jpg";
@@ -11,17 +11,15 @@ export default function Home() {
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
-
-    const section = document.getElementById("products");
-    section?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("products")?.scrollIntoView({
+      behavior: "smooth",
+    });
   };
 
   return (
-    <div className="bg-yellow-50 min-h-screen">
-      <Navbar />
-
-      {/* 🔥 HERO IMAGE SECTION */}
-      <div className="relative h-[500px] md:h-[600px]">
+    <Layout>
+      {/* 🔥 HERO */}
+      <div className="relative h-[420px] sm:h-[520px] md:h-[620px]">
 
         <img
           src={heroImg}
@@ -29,92 +27,95 @@ export default function Home() {
           className="w-full h-full object-cover"
         />
 
-        {/* overlay */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        {/* gradient overlay (premium look) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
 
         {/* content */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 text-white">
-          
-          <h1 className="text-3xl md:text-5xl font-extrabold leading-snug">
-            <span className="text-yellow-400">Shivam Express</span> <br />
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4 text-white">
+
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold leading-tight">
+            <span className="text-yellow-400">Shivam Express</span>
+            <br />
             Bazar Aapke Ghar Par
           </h1>
 
-          <p className="mt-3 text-sm md:text-base">
+          <p className="mt-2 text-xs sm:text-sm md:text-base text-gray-200">
             🚀 Delivery in{" "}
-            <span className="text-yellow-300 font-bold">
+            <span className="text-yellow-300 font-semibold">
               30–60 Minutes
             </span>
           </p>
 
-          {/* SEARCH */}
-          <div className="mt-6 w-full max-w-md flex bg-white rounded-xl overflow-hidden shadow-lg">
+          {/* 🔍 SEARCH (UPGRADED) */}
+          <div className="mt-6 w-full max-w-md flex bg-white rounded-full overflow-hidden shadow-lg">
             <input
               type="text"
               placeholder="Search products..."
-              className="flex-1 px-4 py-3 text-black outline-none"
+              className="flex-1 px-4 py-3 text-black outline-none text-sm"
             />
-            <button className="bg-green-600 px-6 text-white font-semibold">
-              Search
+            <button className="bg-green-600 px-5 text-white font-semibold">
+              🔍
             </button>
           </div>
 
           {/* CTA */}
-          <div className="mt-6 flex gap-4 flex-wrap justify-center">
+          <div className="mt-6 flex gap-3 flex-wrap justify-center">
             <a
               href="https://wa.me/918935847223"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-green-600 px-5 py-2 rounded-lg font-semibold shadow hover:bg-green-700"
+              className="bg-green-600 px-5 py-2 rounded-full font-semibold shadow hover:bg-green-700 text-sm"
             >
-              💬 WhatsApp Order
+              💬 WhatsApp
             </a>
 
             <a
               href="tel:+918935847223"
-              className="bg-red-600 px-5 py-2 rounded-lg font-semibold shadow hover:bg-red-700"
+              className="bg-red-600 px-5 py-2 rounded-full font-semibold shadow hover:bg-red-700 text-sm"
             >
-              📞 Call Now
+              📞 Call
             </a>
           </div>
         </div>
       </div>
 
-      {/* 🔥 CATEGORY BANNERS */}
-      <div className="mt-10 px-6 text-center">
-        <h2 className="text-xl font-bold mb-6">Shop by Category</h2>
+      {/* 🔥 CATEGORY */}
+      <div className="mt-10 px-4 text-center">
+        <h2 className="text-lg sm:text-xl font-bold mb-6">
+          Shop by Category
+        </h2>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
 
-          {/* All */}
+          {/* ALL */}
           <div
             onClick={() => handleCategoryClick("")}
-            className="relative cursor-pointer rounded-2xl overflow-hidden shadow-lg"
+            className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
           >
-            <img src={shopImg} className="h-60 w-full object-cover" />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-lg">
+            <img src={shopImg} className="h-36 sm:h-48 md:h-56 w-full object-cover group-hover:scale-105 transition" />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold">
               All Products
             </div>
           </div>
 
-          {/* Fruits */}
+          {/* FRUITS */}
           <div
             onClick={() => handleCategoryClick("Fruits & Vegetables")}
-            className="relative cursor-pointer rounded-2xl overflow-hidden shadow-lg"
+            className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
           >
-            <img src={fruitsImg} className="h-60 w-full object-cover" />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-lg">
-              Fruits & Vegetables
+            <img src={fruitsImg} className="h-36 sm:h-48 md:h-56 w-full object-cover group-hover:scale-105 transition" />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold">
+              Fruits
             </div>
           </div>
 
-          {/* Groceries */}
+          {/* GROCERIES */}
           <div
             onClick={() => handleCategoryClick("Groceries")}
-            className="relative cursor-pointer rounded-2xl overflow-hidden shadow-lg"
+            className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition col-span-2 md:col-span-1"
           >
-            <img src={heroImg} className="h-60 w-full object-cover" />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-lg">
+            <img src={heroImg} className="h-36 sm:h-48 md:h-56 w-full object-cover group-hover:scale-105 transition" />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold">
               Groceries
             </div>
           </div>
@@ -122,17 +123,17 @@ export default function Home() {
         </div>
       </div>
 
-      {/* PRODUCTS */}
-      <div id="products" className="mt-16 px-6 pb-16">
-        <h2 className="text-xl font-semibold mb-6 text-center">
+      {/* 🔥 PRODUCTS */}
+      <div id="products" className="mt-12 px-3 sm:px-6 pb-24">
+        <h2 className="text-lg sm:text-xl font-semibold mb-6 text-center">
           {selectedCategory
-            ? `${selectedCategory} Products`
+            ? `${selectedCategory}`
             : "All Products"}
         </h2>
 
         <Products selectedCategory={selectedCategory} />
       </div>
 
-    </div>
+    </Layout>
   );
 }

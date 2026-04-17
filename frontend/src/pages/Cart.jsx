@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 export default function Cart() {
   const navigate = useNavigate();
 
-  // ✅ REAL CART (global state)
   const { cart, increaseQty, decreaseQty } = useCart();
 
   const phoneNumber = "918935847223";
-
-  // ✅ BACKEND URL
   const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
+
+  // ✅ NEW: user input
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
 
   // ✅ TOTAL
   const totalPrice = cart.reduce(
@@ -26,7 +28,7 @@ export default function Cart() {
       return;
     }
 
-    let msg = "Hi, I want to place an order:\n\n";
+    let msg = `Hi, I want to place an order:\n\n`;
 
     cart.forEach((item) => {
       msg += `🛒 ${item.name} - Qty: ${item.qty} - ₹${
@@ -40,17 +42,22 @@ export default function Cart() {
     window.open(url, "_blank");
   };
 
-  // 🛒 NEW: PLACE ORDER (DATABASE)
+  // 🛒 PLACE ORDER
   const placeOrder = async () => {
     if (cart.length === 0) {
       alert("Cart is empty");
       return;
     }
 
+    if (!name || !phone || !address) {
+      alert("Please fill all details");
+      return;
+    }
+
     const orderData = {
-      customerName: "Customer",
-      phone: "9999999999",
-      address: "Village Address",
+      customerName: name,
+      phone: phone,
+      address: address,
 
       items: cart.map((item) => ({
         name: item.name,
@@ -60,6 +67,8 @@ export default function Cart() {
 
       totalAmount: totalPrice,
     };
+    console.log("CART DATA:", cart);
+    console.log("FINAL ORDER:", orderData);
 
     try {
       const res = await fetch(`${BASE_URL}/api/orders`, {
@@ -70,9 +79,15 @@ export default function Cart() {
         body: JSON.stringify(orderData),
       });
 
+      const data = await res.json();
+      console.log("Saved Order:", data);
+
       if (!res.ok) throw new Error();
 
-      alert("✅ Order Saved (Admin will process)");
+      alert("✅ Order Saved Successfully");
+
+      // ✅ CLEAR CART (important)
+      window.location.reload();
 
     } catch (err) {
       console.error(err);
@@ -95,13 +110,38 @@ export default function Cart() {
           </button>
         </div>
 
-        {/* EMPTY CART */}
         {cart.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
             Your cart is empty 😔
           </div>
         ) : (
           <>
+            {/* 🧾 CUSTOMER FORM */}
+            <div className="p-4 space-y-3">
+              <input
+                type="text"
+                placeholder="Your Name"
+                className="w-full border p-2 rounded"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+
+              <input
+                type="text"
+                placeholder="Phone Number"
+                className="w-full border p-2 rounded"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+
+              <textarea
+                placeholder="Address"
+                className="w-full border p-2 rounded"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+
             {/* ITEMS */}
             <div className="px-6 py-4 space-y-4">
               {cart.map((item) => (
@@ -123,7 +163,6 @@ export default function Cart() {
                     </div>
                   </div>
 
-                  {/* QTY CONTROL */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => decreaseQty(item._id)}
@@ -142,7 +181,6 @@ export default function Cart() {
                     </button>
                   </div>
 
-                  {/* PRICE */}
                   <div className="font-medium">
                     ₹{item.price * item.qty}
                   </div>
@@ -157,7 +195,6 @@ export default function Cart() {
                 <p className="font-semibold text-lg">₹{totalPrice}</p>
               </div>
 
-              {/* 🛒 NEW BUTTON */}
               <button
                 onClick={placeOrder}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg mb-3 hover:bg-blue-700"
@@ -165,7 +202,6 @@ export default function Cart() {
                 🛒 Place Order
               </button>
 
-              {/* EXISTING WHATSAPP */}
               <button
                 onClick={sendWhatsApp}
                 className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"

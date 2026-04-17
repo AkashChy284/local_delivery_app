@@ -54,24 +54,26 @@ const Products = ({ selectedCategory }) => {
   };
 
   return (
-    <div className="px-4">
+    <div className="px-3 sm:px-4">
 
-      {/* SEARCH */}
-      <div className="mb-6 flex gap-2 max-w-xl mx-auto">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 border rounded-lg px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-        />
-        <button className="bg-yellow-400 px-5 rounded-lg font-semibold hover:bg-yellow-500 transition">
-          Search
-        </button>
+      {/* 🔍 SEARCH BAR */}
+      <div className="mb-5 sticky top-0 z-10 bg-yellow-50 py-3">
+        <div className="flex gap-2 max-w-xl mx-auto">
+          <input
+            type="text"
+            placeholder="Search groceries..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 border rounded-full px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <button className="bg-green-600 text-white px-4 rounded-full text-sm">
+            🔍
+          </button>
+        </div>
       </div>
 
-      {/* PRODUCTS GRID */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+      {/* 🛍️ PRODUCTS GRID */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-5">
 
         {filteredProducts.map((item) => {
           const cartItem = cart.find((i) => i._id === item._id);
@@ -79,38 +81,50 @@ const Products = ({ selectedCategory }) => {
           return (
             <div
               key={item._id}
-              className="bg-white rounded-2xl p-4 text-center shadow-md hover:shadow-xl transition duration-300"
+              className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex flex-col justify-between"
             >
+              {/* IMAGE */}
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-24 mx-auto mb-3 object-contain"
+                className="h-20 sm:h-24 mx-auto object-contain"
               />
 
-              <p className="text-sm font-semibold">{item.name}</p>
-              <p className="text-red-600 font-bold mt-1">₹{item.price}</p>
+              {/* INFO */}
+              <div className="mt-2 text-left">
+                <p className="text-xs sm:text-sm font-semibold line-clamp-2">
+                  {item.name}
+                </p>
 
+                <p className="text-green-600 font-bold text-sm mt-1">
+                  ₹{item.price}
+                </p>
+              </div>
+
+              {/* ACTION */}
               {!cartItem ? (
                 <button
                   onClick={() => addToCart(item)}
-                  className="mt-3 bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-700 transition"
+                  className="mt-2 bg-green-600 text-white text-xs sm:text-sm py-1.5 rounded-lg hover:bg-green-700"
                 >
-                  Add to Cart
+                  Add
                 </button>
               ) : (
-                <div className="flex justify-center items-center gap-3 mt-3">
+                <div className="flex justify-between items-center mt-2 bg-gray-100 rounded-lg px-2 py-1">
                   <button
                     onClick={() => decreaseQty(item._id)}
-                    className="px-3 py-1 bg-gray-200 rounded-lg font-bold"
+                    className="text-lg font-bold px-2"
                   >
-                    -
+                    −
                   </button>
 
-                  <span className="font-semibold">{cartItem.qty}</span>
+                  <span className="text-sm font-semibold">
+                    {cartItem.qty}
+                  </span>
 
                   <button
                     onClick={() => increaseQty(item._id)}
-                    className="px-3 py-1 bg-gray-200 rounded-lg font-bold"
+                    className="text-lg font-bold px-2"
                   >
                     +
                   </button>
@@ -119,26 +133,24 @@ const Products = ({ selectedCategory }) => {
             </div>
           );
         })}
-
       </div>
 
-      {/* WHATSAPP FLOAT BAR */}
+      {/* 🟢 FLOATING CART BAR (LIKE BLINKIT) */}
       {totalItems > 0 && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-6">
+        <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[92%] sm:w-[400px] bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex justify-between items-center">
           
-          <div className="text-sm font-medium">
+          <div className="text-xs sm:text-sm">
             {totalItems} items | ₹{totalPrice}
           </div>
 
           <button
             onClick={placeOrder}
-            className="bg-white text-green-600 px-4 py-1.5 rounded-full font-semibold hover:bg-gray-100 transition"
+            className="bg-white text-green-600 px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold"
           >
-            💬 Order Now
+            Order Now
           </button>
         </div>
       )}
-
     </div>
   );
 };
