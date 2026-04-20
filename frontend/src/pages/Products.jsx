@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
+import { useLocation } from "react-router-dom";
 
 const Products = ({ selectedCategory }) => {
   const [search, setSearch] = useState("");
@@ -7,25 +8,34 @@ const Products = ({ selectedCategory }) => {
 
   const { cart, addToCart, increaseQty, decreaseQty } = useCart();
 
+  const location = useLocation();
+
   const phoneNumber = "918935847223";
   const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
+
+  // ✅ GET CATEGORY FROM URL (?cat=...)
+  const queryParams = new URLSearchParams(location.search);
+  const urlCategory = queryParams.get("cat");
+
+  // ✅ FINAL CATEGORY (URL > PROP)
+  const finalCategory = urlCategory || selectedCategory;
 
   useEffect(() => {
     let url = `${BASE_URL}/api/products`;
 
-    if (selectedCategory) {
-      url += `?category=${encodeURIComponent(selectedCategory)}`;
+    if (finalCategory) {
+      url += `?category=${encodeURIComponent(finalCategory)}`;
     }
 
     fetch(url)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error(err));
-  }, [selectedCategory]);
+  }, [finalCategory]);
 
   const filteredProducts = products.filter((item) => {
-    const matchCategory = selectedCategory
-      ? item.category?.trim().toLowerCase() === selectedCategory.toLowerCase()
+    const matchCategory = finalCategory
+      ? item.category?.trim().toLowerCase() === finalCategory.toLowerCase()
       : true;
 
     const matchSearch = item.name
@@ -56,12 +66,12 @@ const Products = ({ selectedCategory }) => {
   return (
     <div className="px-3 sm:px-4">
 
-      {/* 🔍 SEARCH BAR */}
+      {/* 🔍 SEARCH */}
       <div className="mb-5 sticky top-0 z-10 bg-yellow-50 py-3">
         <div className="flex gap-2 max-w-xl mx-auto">
           <input
             type="text"
-            placeholder="Search groceries..."
+            placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 border rounded-full px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -72,7 +82,7 @@ const Products = ({ selectedCategory }) => {
         </div>
       </div>
 
-      {/* 🛍️ PRODUCTS GRID */}
+      {/* 🛍️ PRODUCTS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-5">
 
         {filteredProducts.map((item) => {
@@ -83,14 +93,12 @@ const Products = ({ selectedCategory }) => {
               key={item._id}
               className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex flex-col justify-between"
             >
-              {/* IMAGE */}
               <img
                 src={item.image}
                 alt={item.name}
                 className="h-20 sm:h-24 mx-auto object-contain"
               />
 
-              {/* INFO */}
               <div className="mt-2 text-left">
                 <p className="text-xs sm:text-sm font-semibold line-clamp-2">
                   {item.name}
@@ -101,7 +109,6 @@ const Products = ({ selectedCategory }) => {
                 </p>
               </div>
 
-              {/* ACTION */}
               {!cartItem ? (
                 <button
                   onClick={() => addToCart(item)}
@@ -135,10 +142,9 @@ const Products = ({ selectedCategory }) => {
         })}
       </div>
 
-      {/* 🟢 FLOATING CART BAR (LIKE BLINKIT) */}
+      {/* 🟢 FLOAT BAR */}
       {totalItems > 0 && (
         <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[92%] sm:w-[400px] bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex justify-between items-center">
-          
           <div className="text-xs sm:text-sm">
             {totalItems} items | ₹{totalPrice}
           </div>
