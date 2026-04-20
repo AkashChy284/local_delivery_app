@@ -12,7 +12,7 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// 📋 Get Orders
+// 📋 Get All Orders (admin)
 export const getOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -23,7 +23,23 @@ export const getOrders = async (req, res) => {
   }
 };
 
-// 🔄 Update Status
+// 🔎 Get Single Order By ID (user tracking)
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json(order);
+  } catch (err) {
+    console.error("Get order by id error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// 🔄 Update Status (admin)
 export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -35,9 +51,7 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({
-        message: "Invalid status",
-      });
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     const updated = await Order.findByIdAndUpdate(

@@ -15,11 +15,30 @@ export default function Cart() {
 
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [placedOrderId, setPlacedOrderId] = useState("");
 
   const totalPrice = cart.reduce(
     (acc, item) => acc + item.price * item.qty,
     0
   );
+
+  const saveOrderToHistory = (order) => {
+    const existing = JSON.parse(localStorage.getItem("myOrders") || "[]");
+
+    const newEntry = {
+      _id: order._id,
+      customerName: order.customerName,
+      phone: order.phone,
+      address: order.address,
+      totalAmount: order.totalAmount,
+      status: order.status,
+      createdAt: order.createdAt,
+    };
+
+    const updated = [newEntry, ...existing.filter((o) => o._id !== order._id)];
+    localStorage.setItem("myOrders", JSON.stringify(updated));
+    localStorage.setItem("lastOrderId", order._id);
+  };
 
   const placeOrder = async () => {
     if (cart.length === 0) {
@@ -56,21 +75,20 @@ export default function Cart() {
       });
 
       const data = await res.json();
-      console.log("Saved Order:", data);
+      console.log("Placed order response:", data);
 
-      if (!res.ok) {
+      if (!res.ok || !data._id) {
         throw new Error(data.message || "Failed to place order");
       }
 
-      // ✅ SHOW BLINKIT-STYLE SUCCESS POPUP
+      setPlacedOrderId(data._id);
       setOrderSuccess(true);
 
-      // ✅ CLEAR CART
+      saveOrderToHistory(data);
       localStorage.removeItem("cart");
 
       setTimeout(() => {
-        setOrderSuccess(false);
-        window.location.href = "/";
+        navigate(`/track-order/${data._id}`);
       }, 2200);
     } catch (err) {
       console.error(err);
@@ -83,7 +101,6 @@ export default function Cart() {
   return (
     <div className="min-h-screen bg-[#f7f8fa] py-4 sm:py-8 px-3 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        {/* HEADER */}
         <div className="bg-white rounded-3xl shadow-sm border overflow-hidden">
           <div className="bg-green-600 text-white px-5 sm:px-6 py-4 flex justify-between items-center">
             <div>
@@ -107,7 +124,6 @@ export default function Cart() {
             </div>
           ) : (
             <>
-              {/* CUSTOMER FORM */}
               <div className="p-4 sm:p-6 border-b bg-white">
                 <h2 className="text-lg font-bold text-gray-800 mb-4">
                   Delivery Details
@@ -140,7 +156,6 @@ export default function Cart() {
                 </div>
               </div>
 
-              {/* ITEMS */}
               <div className="px-4 sm:px-6 py-4 bg-white">
                 <h2 className="text-lg font-bold text-gray-800 mb-4">
                   Cart Items
@@ -201,7 +216,6 @@ export default function Cart() {
                 </div>
               </div>
 
-              {/* FOOTER */}
               <div className="border-t px-4 sm:px-6 py-5 bg-white">
                 <div className="bg-green-50 border border-green-100 rounded-2xl p-4 mb-4">
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
@@ -233,7 +247,7 @@ export default function Cart() {
         </div>
       </div>
 
-      <OrderSuccess show={orderSuccess} />
+      <OrderSuccess show={orderSuccess} orderId={placedOrderId} />
     </div>
   );
 }
