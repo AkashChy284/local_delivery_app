@@ -6,3 +6,21 @@ body {
   padding: 0;
   overflow-x: hidden;
 }
+@keyframes scaleUp {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale {
+  animation: scaleUp 0.3s ease-out;
+}
+
+@keyframes draw {
+  0% { stroke-dasharray: 0 100; }
+  100% { stroke-dasharray: 100 0; }
+}
+
+.animate-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+}
