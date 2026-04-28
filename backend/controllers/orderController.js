@@ -3,7 +3,62 @@ import Order from "../models/Order.js";
 const estimateDistanceFromAddress = (address = "") => {
   const text = address.toLowerCase();
 
-  // ✅ Near areas
+  // 🔴 FAR (6–10 km)
+  if (
+    text.includes("madhubani") ||
+    text.includes("nagdah") ||
+    text.includes("balain") ||
+    text.includes("simri") ||
+    text.includes("bisfi") ||
+
+    // your added areas (far group)
+    text.includes("muhammadpur") ||
+    text.includes("gaibipur") ||
+    text.includes("nandi") ||
+    text.includes("bhawji") ||
+    text.includes("ghamaria") ||
+    text.includes("durgouli") ||
+    text.includes("toeth") ||
+    text.includes("kashuli") ||
+    text.includes("mankaur") ||
+    text.includes("akaur") ||
+    text.includes("bharampura") ||
+    text.includes("debpura") ||
+    text.includes("sarso")
+  ) {
+    return {
+      distance: "6–10 km",
+      deliveryCharge: 80,
+      deliveryTime: "60–90 mins",
+    };
+  }
+
+  // 🟡 MEDIUM (3–6 km)
+  if (
+    text.includes("rahika") ||
+    text.includes("arih") ||
+    text.includes("saurath") ||
+    text.includes("parsauni") ||
+    text.includes("kerwar") ||
+
+    // your added areas (medium group)
+    text.includes("bankatta") ||
+    text.includes("damodarpur") ||
+    text.includes("katiya") ||
+    text.includes("gongoli") ||
+    text.includes("uchaith") ||
+    text.includes("mahalamore") ||
+    text.includes("baitona") ||
+    text.includes("dhanuja")
+  ) {
+    return {
+      distance: "3–6 km",
+      deliveryCharge: 50,
+      deliveryTime: "40–60 mins",
+    };
+  }
+
+  // 🟢 NEAR (0–3 km)
   if (
     text.includes("vidyapati") ||
     text.includes("benipatti") ||
@@ -18,37 +73,7 @@ const estimateDistanceFromAddress = (address = "") => {
     };
   }
 
-  // ✅ Medium areas
-  if (
-    text.includes("rahika") ||
-    text.includes("arih") ||
-    text.includes("saurath") ||
-    text.includes("parsauni") ||
-    text.includes("kerwar")
-  ) {
-    return {
-      distance: "3–6 km",
-      deliveryCharge: 50,
-      deliveryTime: "40–60 mins",
-    };
-  }
-
-  // ✅ Far areas
-  if (
-    text.includes("madhubani") ||
-    text.includes("nagdah") ||
-    text.includes("balain") ||
-    text.includes("simri") ||
-    text.includes("bisfi")
-  ) {
-    return {
-      distance: "6–10 km",
-      deliveryCharge: 80,
-      deliveryTime: "60–90 mins",
-    };
-  }
-
-  // ✅ Default if address is unknown
+  // ⚪ DEFAULT
   return {
     distance: "To be verified",
     deliveryCharge: 30,
@@ -143,7 +168,6 @@ export const updateOrderStatus = async (req, res) => {
       order.status = status;
     }
 
-    // admin can still manually correct distance
     if (distance !== undefined && distance !== null && distance !== "") {
       const km = Number(distance);
 
