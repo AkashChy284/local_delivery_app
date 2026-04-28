@@ -7,7 +7,7 @@ export default function Cart() {
   const navigate = useNavigate();
   const { cart, increaseQty, decreaseQty } = useCart();
 
-  const BASE_URL = "http://localhost:5000";
+  const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
