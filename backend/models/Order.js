@@ -32,12 +32,12 @@ const orderSchema = new mongoose.Schema(
 
     deliveryCharge: {
       type: Number,
-      default: 0,
+      default: 30,
     },
 
     handlingCharge: {
       type: Number,
-      default: 0,
+      default: 10,
     },
 
     totalAmount: {
@@ -48,6 +48,21 @@ const orderSchema = new mongoose.Schema(
     distance: {
       type: String,
       default: "To be verified",
+    },
+
+    deliveryTime: {
+      type: String,
+      default: "30–60 mins",
+    },
+
+    mapOrigin: {
+      type: String,
+      default: "Vidyapati Chowk, Benipatti, Bihar",
+    },
+
+    mapDestination: {
+      type: String,
+      default: "",
     },
 
     status: {

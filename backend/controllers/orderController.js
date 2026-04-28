@@ -1,11 +1,107 @@
 import Order from "../models/Order.js";
 
+const estimateDistanceFromAddress = (address = "") => {
+  const text = address.toLowerCase();
+
+  // ✅ Near areas
+  if (
+    text.includes("vidyapati") ||
+    text.includes("benipatti") ||
+    text.includes("chowk") ||
+    text.includes("market") ||
+    text.includes("bus stand")
+  ) {
+    return {
+      distance: "0–3 km",
+      deliveryCharge: 30,
+      deliveryTime: "30–45 mins",
+    };
+  }
+
+  // ✅ Medium areas
+  if (
+    text.includes("rahika") ||
+    text.includes("arih") ||
+    text.includes("saurath") ||
+    text.includes("parsauni") ||
+    text.includes("kerwar")
+  ) {
+    return {
+      distance: "3–6 km",
+      deliveryCharge: 50,
+      deliveryTime: "40–60 mins",
+    };
+  }
+
+  // ✅ Far areas
+  if (
+    text.includes("madhubani") ||
+    text.includes("nagdah") ||
+    text.includes("balain") ||
+    text.includes("simri") ||
+    text.includes("bisfi")
+  ) {
+    return {
+      distance: "6–10 km",
+      deliveryCharge: 80,
+      deliveryTime: "60–90 mins",
+    };
+  }
+
+  // ✅ Default if address is unknown
+  return {
+    distance: "To be verified",
+    deliveryCharge: 30,
+    deliveryTime: "30–60 mins",
+  };
+};
+
 export const createOrder = async (req, res) => {
   try {
-    const order = new Order(req.body);
+    const {
+      customerName,
+      phone,
+      address,
+      items = [],
+      subtotal,
+      handlingCharge,
+    } = req.body;
+
+    const calculatedSubtotal =
+      subtotal ||
+      items.reduce(
+        (sum, item) =>
+          sum + Number(item.price || 0) * Number(item.quantity || 0),
+        0
+      );
+
+    const finalHandlingCharge =
+      handlingCharge !== undefined ? Number(handlingCharge) : 10;
+
+    const estimate = estimateDistanceFromAddress(address);
+
+    const totalAmount =
+      calculatedSubtotal + estimate.deliveryCharge + finalHandlingCharge;
+
+    const order = new Order({
+      customerName,
+      phone,
+      address,
+      items,
+      subtotal: calculatedSubtotal,
+      deliveryCharge: estimate.deliveryCharge,
+      handlingCharge: finalHandlingCharge,
+      totalAmount,
+      distance: estimate.distance,
+      deliveryTime: estimate.deliveryTime,
+      mapOrigin: "Vidyapati Chowk, Benipatti, Bihar",
+      mapDestination: address,
+    });
+
     const saved = await order.save();
     res.status(201).json(saved);
   } catch (err) {
+    console.error("Create order error:", err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -47,6 +143,7 @@ export const updateOrderStatus = async (req, res) => {
       order.status = status;
     }
 
+    // admin can still manually correct distance
     if (distance !== undefined && distance !== null && distance !== "") {
       const km = Number(distance);
 
