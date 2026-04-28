@@ -21,16 +21,11 @@ export default function Orders() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        console.log("Error:", data);
-        return;
-      }
+      if (!res.ok) return;
 
       if (data.length > 0 && lastOrderId && data[0]._id !== lastOrderId) {
-        if (audioRef.current) {
-          audioRef.current.play().catch(() => {});
-        }
-        alert("🆕 New Order Received!");
+        audioRef.current?.play().catch(() => {});
+        alert("🆕 New Order!");
       }
 
       if (data.length > 0) {
@@ -45,13 +40,12 @@ export default function Orders() {
 
   useEffect(() => {
     fetchOrders();
-
     const interval = setInterval(fetchOrders, 5000);
-
     return () => clearInterval(interval);
   }, [lastOrderId]);
 
-  const updateStatus = async (id, status) => {
+  // ✅ UPDATED FUNCTION (IMPORTANT)
+  const updateStatus = async (id, status, distance = null) => {
     try {
       const token = localStorage.getItem("adminToken");
 
@@ -63,26 +57,25 @@ export default function Orders() {
             "Content-Type": "application/json",
             Authorization: token,
           },
-          body: JSON.stringify({ status }),
+          body: JSON.stringify({
+            status,
+            distance: distance ? Number(distance) : undefined,
+          }),
         }
       );
 
       const data = await res.json();
 
       if (!res.ok) {
-        console.log("Update Error:", data);
-        alert("Failed to update status");
+        alert("Update failed");
         return;
       }
 
       setOrders((prev) =>
-        prev.map((order) =>
-          order._id === id ? { ...order, status } : order
-        )
+        prev.map((o) => (o._id === id ? data : o))
       );
     } catch (err) {
       console.error(err);
-      alert("Something went wrong while updating status");
     }
   };
 
@@ -103,76 +96,103 @@ export default function Orders() {
 
   return (
     <div className="space-y-4">
-      <audio ref={audioRef} src="/notification.mp3" preload="auto" />
+      <audio ref={audioRef} src="/notification.mp3" />
 
       {orders.length === 0 ? (
-        <p className="text-gray-500">No orders found 😔</p>
+        <p>No orders</p>
       ) : (
         orders.map((order) => (
-          <div
-            key={order._id}
-            className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition"
-          >
-            <div className="flex justify-between items-start mb-3 gap-4">
+          <div key={order._id} className="bg-white p-4 rounded shadow">
+
+            {/* HEADER */}
+            <div className="flex justify-between">
               <div>
-                <h2 className="font-semibold text-lg">
-                  {order.customerName || "No Name"}
-                </h2>
-                <p className="text-sm text-gray-600">{order.phone || "No phone"}</p>
-                <p className="text-sm text-gray-500">
-                  {order.address || "No address"}
-                </p>
+                <p className="font-bold">{order.customerName}</p>
+                <p className="text-sm">{order.phone}</p>
+                <p className="text-sm">{order.address}</p>
               </div>
 
-              <span
-                className={`text-sm px-3 py-1 rounded-full ${getStatusStyle(
-                  order.status
-                )}`}
-              >
+              <span className={`px-2 py-1 text-xs rounded ${getStatusStyle(order.status)}`}>
                 {order.status}
               </span>
             </div>
 
-            <div className="text-sm text-gray-700 mb-3 space-y-1">
-              {order.items && order.items.length > 0 ? (
-                order.items.map((item, i) => (
-                  <p key={i}>
-                    {item.name} × {item.quantity}
-                  </p>
-                ))
-              ) : (
-                <p>No items</p>
-              )}
+            {/* ITEMS */}
+            <div className="mt-2 text-sm">
+              {order.items?.map((item, i) => (
+                <p key={i}>
+                  {item.name} × {item.quantity}
+                </p>
+              ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-3">
-              <span className="font-bold text-green-600 text-lg">
-                ₹{order.totalAmount || 0}
-              </span>
+            {/* BILL */}
+            <div className="mt-2 text-sm bg-gray-50 p-2 rounded">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>₹{order.subtotal || 0}</span>
+              </div>
 
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => updateStatus(order._id, "accepted")}
-                  className="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600"
-                >
-                  Accept
-                </button>
+              <div className="flex justify-between">
+                <span>Delivery</span>
+                <span>₹{order.deliveryCharge || 0}</span>
+              </div>
 
-                <button
-                  onClick={() => updateStatus(order._id, "delivered")}
-                  className="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600"
-                >
-                  Delivered
-                </button>
+              <div className="flex justify-between">
+                <span>Handling</span>
+                <span>₹{order.handlingCharge || 0}</span>
+              </div>
 
-                <button
-                  onClick={() => updateStatus(order._id, "cancelled")}
-                  className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600"
-                >
-                  Cancel
-                </button>
+              <div className="flex justify-between font-bold border-t mt-1 pt-1">
+                <span>Total</span>
+                <span>₹{order.totalAmount}</span>
               </div>
             </div>
+
+            {/* DISTANCE */}
+            <p className="text-xs mt-1">
+              Distance: {order.distance || "Not set"}
+            </p>
+
+            {/* ACTIONS */}
+            <div className="flex gap-2 mt-3 items-center">
+
+              {/* INPUT */}
+              <input
+                type="number"
+                placeholder="km"
+                className="w-14 border px-1 text-xs"
+                onChange={(e) => (order.tempDistance = e.target.value)}
+              />
+
+              <button
+                onClick={() =>
+                  updateStatus(order._id, "accepted", order.tempDistance)
+                }
+                className="bg-blue-500 text-white px-2 py-1 text-xs"
+              >
+                Accept
+              </button>
+
+              <button
+                onClick={() =>
+                  updateStatus(order._id, "delivered")
+                }
+                className="bg-green-500 text-white px-2 py-1 text-xs"
+              >
+                Delivered
+              </button>
+
+              <button
+                onClick={() =>
+                  updateStatus(order._id, "cancelled")
+                }
+                className="bg-red-500 text-white px-2 py-1 text-xs"
+              >
+                Cancel
+              </button>
+            </div>
+
           </div>
         ))
       )}

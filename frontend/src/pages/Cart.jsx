@@ -7,7 +7,7 @@ export default function Cart() {
   const navigate = useNavigate();
   const { cart, increaseQty, decreaseQty } = useCart();
 
-  const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
+  const BASE_URL = "http://localhost:5000";
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -22,6 +22,11 @@ export default function Cart() {
     0
   );
 
+  const deliveryCharge = cart.length > 0 ? 30 : 0;
+  const handlingCharge = cart.length > 0 ? 10 : 0;
+  const grandTotal = totalPrice + deliveryCharge + handlingCharge;
+  const distanceRange = "To be verified";
+
   const saveOrderToHistory = (order) => {
     const existing = JSON.parse(localStorage.getItem("myOrders") || "[]");
 
@@ -33,9 +38,13 @@ export default function Cart() {
       totalAmount: order.totalAmount,
       status: order.status,
       createdAt: order.createdAt,
+      distance: order.distance,
+      deliveryCharge: order.deliveryCharge,
+      handlingCharge: order.handlingCharge,
     };
 
     const updated = [newEntry, ...existing.filter((o) => o._id !== order._id)];
+
     localStorage.setItem("myOrders", JSON.stringify(updated));
     localStorage.setItem("lastOrderId", order._id);
   };
@@ -55,12 +64,16 @@ export default function Cart() {
       customerName: name.trim(),
       phone: phone.trim(),
       address: address.trim(),
+      distance: distanceRange,
+      subtotal: totalPrice,
+      deliveryCharge,
+      handlingCharge,
+      totalAmount: grandTotal,
       items: cart.map((item) => ({
         name: item.name,
         price: item.price,
         quantity: item.qty,
       })),
-      totalAmount: totalPrice,
     };
 
     try {
@@ -153,6 +166,28 @@ export default function Cart() {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                   />
+
+                  <div className="bg-green-50 border border-green-100 rounded-2xl p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="text-2xl">📍</div>
+
+                      <div>
+                        <p className="font-semibold text-gray-800">
+                          Delivery distance will be verified
+                        </p>
+
+                        <p className="text-sm text-gray-600 mt-1">
+                          Base delivery charge is ₹30 for nearby areas. Final
+                          distance will be checked from your address by Shivam
+                          Express.
+                        </p>
+
+                        <p className="text-xs text-green-700 mt-2 font-medium">
+                          Estimated delivery: 30–60 minutes
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -219,19 +254,28 @@ export default function Cart() {
               <div className="border-t px-4 sm:px-6 py-5 bg-white">
                 <div className="bg-green-50 border border-green-100 rounded-2xl p-4 mb-4">
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Items</span>
-                    <span>{cart.length}</span>
+                    <span>Subtotal</span>
+                    <span>₹{totalPrice}</span>
                   </div>
 
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Delivery</span>
-                    <span>Free</span>
+                    <span>Delivery estimate</span>
+                    <span>₹{deliveryCharge}</span>
+                  </div>
+
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Handling Charge</span>
+                    <span>₹{handlingCharge}</span>
                   </div>
 
                   <div className="flex justify-between text-lg font-bold text-green-700 border-t pt-3 mt-3">
                     <span>Total</span>
-                    <span>₹{totalPrice}</span>
+                    <span>₹{grandTotal}</span>
                   </div>
+
+                  <p className="text-xs text-gray-500 mt-3">
+                    *Delivery charge may change after address verification.
+                  </p>
                 </div>
 
                 <button
