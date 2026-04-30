@@ -1,15 +1,16 @@
 import Navbar from "./Navbar";
+import BottomNav from "./BottomNav";
 
 export default function Layout({ children }) {
-  if (!children) return null; // safety
-
   return (
-    <div className="min-h-screen bg-yellow-50">
+    <div className="min-h-screen bg-[#f7f8fa]">
       <Navbar />
 
-      <main className="max-w-screen-xl mx-auto px-3 sm:px-6">
+      <main className="pb-20 md:pb-0">
         {children}
       </main>
+
+      <BottomNav />
     </div>
   );
 }

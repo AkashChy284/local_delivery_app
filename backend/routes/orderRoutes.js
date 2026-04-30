@@ -3,19 +3,20 @@ import {
   createOrder,
   getOrders,
   getOrderById,
+  getMyOrders,
   updateOrderStatus,
 } from "../controllers/orderController.js";
 
 import authMiddleware from "../middleware/auth.js";
+import userAuth from "../middleware/userAuth.js";
 
 const router = express.Router();
 
-// 🟢 User routes
-router.post("/", createOrder);
-router.get("/:id", getOrderById);
+router.post("/", userAuth, createOrder);
+router.get("/my/orders", userAuth, getMyOrders);
 
-// 🔐 Admin routes
 router.get("/", authMiddleware, getOrders);
+router.get("/:id", getOrderById);
 router.put("/:id", authMiddleware, updateOrderStatus);
 
 export default router;

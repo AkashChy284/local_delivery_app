@@ -109,6 +109,7 @@ export const createOrder = async (req, res) => {
       calculatedSubtotal + estimate.deliveryCharge + finalHandlingCharge;
 
     const order = new Order({
+      user: req.user.id,
       customerName,
       phone,
       address,

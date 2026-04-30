@@ -25,31 +25,15 @@ export default function Cart() {
   const deliveryCharge = cart.length > 0 ? 30 : 0;
   const handlingCharge = cart.length > 0 ? 10 : 0;
   const grandTotal = totalPrice + deliveryCharge + handlingCharge;
-  const distanceRange = "To be verified";
-
-  const saveOrderToHistory = (order) => {
-    const existing = JSON.parse(localStorage.getItem("myOrders") || "[]");
-
-    const newEntry = {
-      _id: order._id,
-      customerName: order.customerName,
-      phone: order.phone,
-      address: order.address,
-      totalAmount: order.totalAmount,
-      status: order.status,
-      createdAt: order.createdAt,
-      distance: order.distance,
-      deliveryCharge: order.deliveryCharge,
-      handlingCharge: order.handlingCharge,
-    };
-
-    const updated = [newEntry, ...existing.filter((o) => o._id !== order._id)];
-
-    localStorage.setItem("myOrders", JSON.stringify(updated));
-    localStorage.setItem("lastOrderId", order._id);
-  };
 
   const placeOrder = async () => {
+    const token = localStorage.getItem("userToken");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     if (cart.length === 0) {
       alert("Cart is empty");
       return;
@@ -64,7 +48,6 @@ export default function Cart() {
       customerName: name.trim(),
       phone: phone.trim(),
       address: address.trim(),
-      distance: distanceRange,
       subtotal: totalPrice,
       deliveryCharge,
       handlingCharge,
@@ -83,12 +66,12 @@ export default function Cart() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
         body: JSON.stringify(orderData),
       });
 
       const data = await res.json();
-      console.log("Placed order response:", data);
 
       if (!res.ok || !data._id) {
         throw new Error(data.message || "Failed to place order");
@@ -97,7 +80,6 @@ export default function Cart() {
       setPlacedOrderId(data._id);
       setOrderSuccess(true);
 
-      saveOrderToHistory(data);
       localStorage.removeItem("cart");
 
       setTimeout(() => {
@@ -177,9 +159,8 @@ export default function Cart() {
                         </p>
 
                         <p className="text-sm text-gray-600 mt-1">
-                          Base delivery charge is ₹30 for nearby areas. Final
-                          distance will be checked from your address by Shivam
-                          Express.
+                          Delivery charge will be calculated automatically from
+                          your address.
                         </p>
 
                         <p className="text-xs text-green-700 mt-2 font-medium">
@@ -274,7 +255,8 @@ export default function Cart() {
                   </div>
 
                   <p className="text-xs text-gray-500 mt-3">
-                    *Delivery charge may change after address verification.
+                    *Final delivery charge is adjusted from address by Shivam
+                    Express.
                   </p>
                 </div>
 

@@ -4,47 +4,25 @@ import { useNavigate } from "react-router-dom";
 export default function MyOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
-
   const BASE_URL = "https://local-delivery-app-l4je.onrender.com";
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("myOrders") || "[]");
+    const token = localStorage.getItem("userToken");
 
-    if (stored.length === 0) {
-      setOrders([]);
+    if (!token) {
+      navigate("/login");
       return;
     }
 
-    const fetchLatestOrders = async () => {
-      try {
-        const results = await Promise.all(
-          stored.map(async (order) => {
-            try {
-              const res = await fetch(`${BASE_URL}/api/orders/${order._id}`);
-              const data = await res.json();
-              return res.ok ? data : order;
-            } catch {
-              return order;
-            }
-          })
-        );
-
-        setOrders(results);
-        localStorage.setItem("myOrders", JSON.stringify(results));
-      } catch (err) {
-        console.error(err);
-        setOrders(stored);
-      }
-    };
-
-    fetchLatestOrders();
+    fetch(`${BASE_URL}/api/orders/my/orders`, {
+      headers: {
+        Authorization: token,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setOrders(Array.isArray(data) ? data : []))
+      .catch(() => setOrders([]));
   }, []);
-
-  const clearOrderHistory = () => {
-    localStorage.removeItem("myOrders");
-    localStorage.removeItem("lastOrderId");
-    setOrders([]);
-  };
 
   const getStatusClass = (status) => {
     if (status === "pending") return "bg-yellow-100 text-yellow-700";
@@ -55,31 +33,17 @@ export default function MyOrders() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] px-4 py-6">
+    <div className="min-h-screen bg-[#f7f8fa] px-4 py-6 pb-24">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-3xl shadow-sm border overflow-hidden">
-
-          {/* HEADER */}
-          <div className="bg-green-600 text-white px-6 py-5 flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">My Orders</h1>
-              <p className="text-sm text-green-100 mt-1">
-                Your recent orders
-              </p>
-            </div>
-
-            {orders.length > 0 && (
-              <button
-                onClick={clearOrderHistory}
-                className="bg-white text-green-700 px-3 py-2 rounded-xl text-sm font-semibold"
-              >
-                Clear
-              </button>
-            )}
+          <div className="bg-green-600 text-white px-6 py-5">
+            <h1 className="text-2xl font-bold">My Orders</h1>
+            <p className="text-sm text-green-100 mt-1">
+              Your saved order history
+            </p>
           </div>
 
-          {/* BODY */}
-          <div className="p-6">
+          <div className="p-5">
             {orders.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 No orders yet 😔
@@ -89,25 +53,23 @@ export default function MyOrders() {
                 {orders.map((order) => (
                   <div
                     key={order._id}
-                    className="border rounded-2xl p-4 shadow-sm"
+                    className="border rounded-2xl p-4 shadow-sm bg-white"
                   >
-                    <div className="flex justify-between">
+                    <div className="flex justify-between gap-3">
                       <div>
-                        <p className="font-semibold">
-                          {order.customerName || "Customer"}
-                        </p>
-
-                        <p className="text-xs text-gray-500 break-all">
-                          {order._id}
-                        </p>
-
-                        <p className="text-sm mt-1">
+                        <p className="font-bold text-gray-900">
                           ₹{order.totalAmount}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {order.address}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {order._id}
                         </p>
                       </div>
 
                       <span
-                        className={`px-3 py-1 text-xs rounded-full ${getStatusClass(
+                        className={`h-fit px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusClass(
                           order.status
                         )}`}
                       >
@@ -115,23 +77,20 @@ export default function MyOrders() {
                       </span>
                     </div>
 
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        onClick={() =>
-                          navigate(`/track-order/${order._id}`)
-                        }
-                        className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm"
-                      >
-                        Track
-                      </button>
-
-                      <button
-                        onClick={() => navigate("/products")}
-                        className="bg-gray-200 px-4 py-2 rounded-xl text-sm"
-                      >
-                        Order Again
-                      </button>
+                    <div className="mt-3 text-sm text-gray-600">
+                      {order.items?.slice(0, 3).map((item, i) => (
+                        <p key={i}>
+                          {item.name} × {item.quantity}
+                        </p>
+                      ))}
                     </div>
+
+                    <button
+                      onClick={() => navigate(`/track-order/${order._id}`)}
+                      className="w-full mt-4 bg-green-600 text-white py-3 rounded-2xl font-semibold"
+                    >
+                      Track Order
+                    </button>
                   </div>
                 ))}
               </div>
@@ -139,7 +98,7 @@ export default function MyOrders() {
 
             <button
               onClick={() => navigate("/")}
-              className="w-full mt-6 bg-gray-200 py-3 rounded-xl"
+              className="w-full mt-6 bg-gray-100 py-3 rounded-2xl font-semibold"
             >
               Back Home
             </button>

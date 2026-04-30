@@ -4,31 +4,27 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 
 import productRoutes from "./routes/productRoutes.js";
-import { authRoutes } from "./routes/authRoutes.js"; // ✅ FIXED
-import orderRoutes from "./routes/orderRoutes.js"; // ✅ NEW
+import { authRoutes } from "./routes/authRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
-// ✅ CORS
 app.use(cors());
-
-// ✅ Body parser
 app.use(express.json());
 
-// ✅ Test route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// ✅ Routes
-app.use("/api/auth", authRoutes);        // login
-app.use("/api/products", productRoutes); // products
-app.use("/api/orders", orderRoutes);     // ✅ NEW (orders)
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
-// ✅ PORT
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () =>

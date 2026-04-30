@@ -7,6 +7,7 @@ import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import TrackOrder from "./pages/TrackOrder";
 import MyOrders from "./pages/MyOrders";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/track-order/:id" element={<TrackOrder />} />
       <Route path="/my-orders" element={<MyOrders />} />
+      <Route path="/login" element={<Login />} />
 
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/shivam-secret-admin-123" element={<Admin />} />

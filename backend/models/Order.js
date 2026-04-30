@@ -7,6 +7,12 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    user: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+  },
+
     phone: {
       type: String,
       required: true,
