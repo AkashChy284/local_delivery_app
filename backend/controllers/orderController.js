@@ -3,15 +3,12 @@ import Order from "../models/Order.js";
 const estimateDistanceFromAddress = (address = "") => {
   const text = address.toLowerCase();
 
-  // 🔴 FAR (6–10 km)
   if (
     text.includes("madhubani") ||
     text.includes("nagdah") ||
     text.includes("balain") ||
     text.includes("simri") ||
     text.includes("bisfi") ||
-
-    // your added areas (far group)
     text.includes("muhammadpur") ||
     text.includes("gaibipur") ||
     text.includes("nandi") ||
@@ -33,15 +30,12 @@ const estimateDistanceFromAddress = (address = "") => {
     };
   }
 
-  // 🟡 MEDIUM (3–6 km)
   if (
     text.includes("rahika") ||
     text.includes("arih") ||
     text.includes("saurath") ||
     text.includes("parsauni") ||
     text.includes("kerwar") ||
-
-    // your added areas (medium group)
     text.includes("bankatta") ||
     text.includes("damodarpur") ||
     text.includes("katiya") ||
@@ -58,7 +52,6 @@ const estimateDistanceFromAddress = (address = "") => {
     };
   }
 
-  // 🟢 NEAR (0–3 km)
   if (
     text.includes("vidyapati") ||
     text.includes("benipatti") ||
@@ -73,7 +66,6 @@ const estimateDistanceFromAddress = (address = "") => {
     };
   }
 
-  // ⚪ DEFAULT
   return {
     distance: "To be verified",
     deliveryCharge: 30,
@@ -135,6 +127,18 @@ export const createOrder = async (req, res) => {
 export const getOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user.id }).sort({
+      createdAt: -1,
+    });
+
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: err.message });
